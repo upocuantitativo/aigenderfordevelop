@@ -1,8 +1,8 @@
-# GDP Growth Prediction - Gender Indicators Analysis
+# GDP Growth Prediction - Entrepreneurship & Gender Indicators Analysis
 
 ## Overview
 
-Machine learning analysis predicting **GDP per capita growth** using gender and development indicators in 52 low and lower-middle income countries.
+Machine learning analysis predicting **GDP per capita growth** using entrepreneurship, gender and development indicators in 52 low and lower-middle income countries.
 
 **Target Variable:** G_GPD_PCAP_SLOPE (GDP per capita growth trajectory)
 

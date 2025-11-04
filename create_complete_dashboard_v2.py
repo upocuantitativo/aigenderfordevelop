@@ -1,45 +1,110 @@
-<!DOCTYPE html>
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Create Complete Academic Dashboard with 3 Tabs - FIXED VERSION
+1. Analysis Results
+2. Descriptive Statistics & Correlations
+3. Policy Projections / Sensitivity Analysis
+"""
+
+import pickle
+import pandas as pd
+import numpy as np
+from datetime import datetime
+
+# Get current date
+current_date = datetime.now().strftime('%d %B %Y')
+current_date_short = datetime.now().strftime('%Y-%m-%d')
+
+# Load data and results
+df = pd.read_excel('DATA_GHAB2.xlsx')
+with open('resultados/modelos/all_results.pkl', 'rb') as f:
+    results = pickle.load(f)
+
+target = 'G_GPD_PCAP_SLOPE'
+res = results[target]
+best_name, best_res = res['best']
+top3 = res['top_3']
+predictors = res['predictors']
+
+# Calculate correlations
+from scipy.stats import pearsonr
+correlations = []
+for var in predictors:
+    mask = df[target].notna() & df[var].notna()
+    if mask.sum() >= 10:
+        r, p = pearsonr(df.loc[mask, var], df.loc[mask, target])
+        correlations.append({
+            'Variable': var,
+            'Correlation': r,
+            'Abs_Corr': abs(r),
+            'P_value': p
+        })
+
+corr_df = pd.DataFrame(correlations).sort_values('Abs_Corr', ascending=False)
+
+# Descriptive statistics for top variables
+desc_stats = df[predictors + [target]].describe().T
+
+# Load top 15 SHAP importance
+try:
+    shap_top15 = pd.read_csv('resultados/top_15_shap_importance.csv')
+except:
+    shap_top15 = pd.DataFrame({'Variable': predictors[:15], 'Importance': [0]*15})
+
+# Get validation stats - PROPERLY EVALUATE THEM
+shapiro_p = res['validation']['shapiro_p']
+bootstrap_mean = res['validation']['bootstrap_r2_mean']
+bootstrap_ci_low = res['validation']['bootstrap_ci'][0]
+bootstrap_ci_high = res['validation']['bootstrap_ci'][1]
+
+if shapiro_p > 0.05:
+    shapiro_interp = "Residuals normal (p > 0.05)"
+else:
+    shapiro_interp = "Non-normal residuals"
+
+html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GDP Growth Analysis - Entrepreneurship & Gender Indicators</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
 
-        body {
+        body {{
             font-family: Georgia, 'Times New Roman', serif;
             font-size: 10pt;
             line-height: 1.4;
             color: #000;
             background: #fff;
-        }
+        }}
 
-        .header {
+        .header {{
             background: #f5f5f5;
             border-bottom: 2px solid #000;
             padding: 15px 20px;
             text-align: center;
-        }
+        }}
 
-        h1 {
+        h1 {{
             font-size: 16pt;
             font-weight: bold;
             margin-bottom: 5px;
-        }
+        }}
 
-        .subtitle {
+        .subtitle {{
             font-size: 9pt;
             color: #555;
-        }
+        }}
 
-        .tabs {
+        .tabs {{
             display: flex;
             background: #e8e8e8;
             border-bottom: 1px solid #999;
-        }
+        }}
 
-        .tab {
+        .tab {{
             flex: 1;
             padding: 10px 15px;
             text-align: center;
@@ -49,157 +114,157 @@
             font-size: 9.5pt;
             background: #e8e8e8;
             transition: background 0.2s;
-        }
+        }}
 
-        .tab:hover {
+        .tab:hover {{
             background: #d8d8d8;
-        }
+        }}
 
-        .tab.active {
+        .tab.active {{
             background: #fff;
             border-bottom: 2px solid #fff;
-        }
+        }}
 
-        .tab-content {
+        .tab-content {{
             display: none;
             padding: 20px;
             max-width: 1000px;
             margin: 0 auto;
-        }
+        }}
 
-        .tab-content.active {
+        .tab-content.active {{
             display: block;
-        }
+        }}
 
-        h2 {
+        h2 {{
             font-size: 12pt;
             font-weight: bold;
             margin: 15px 0 8px 0;
             border-bottom: 1px solid #666;
             padding-bottom: 3px;
-        }
+        }}
 
-        h3 {
+        h3 {{
             font-size: 10.5pt;
             font-weight: bold;
             margin: 10px 0 5px 0;
-        }
+        }}
 
-        table {
+        table {{
             width: 100%;
             border-collapse: collapse;
             margin: 10px 0;
             font-size: 9pt;
-        }
+        }}
 
-        th {
+        th {{
             background-color: #e8e8e8;
             border: 1px solid #555;
             padding: 4px 6px;
             text-align: left;
             font-weight: bold;
-        }
+        }}
 
-        td {
+        td {{
             border: 1px solid #888;
             padding: 4px 6px;
-        }
+        }}
 
-        .best { background-color: #f5f5dc; font-weight: bold; }
+        .best {{ background-color: #f5f5dc; font-weight: bold; }}
 
-        .summary {
+        .summary {{
             background-color: #f9f9f9;
             border: 1px solid #666;
             padding: 10px;
             margin: 10px 0;
-        }
+        }}
 
-        .methodology {
+        .methodology {{
             background-color: #f0f8ff;
             border: 1px solid #4682B4;
             padding: 12px;
             margin: 10px 0;
             font-size: 9.5pt;
-        }
+        }}
 
-        .methodology h3 {
+        .methodology h3 {{
             color: #2c5282;
             margin-top: 8px;
             margin-bottom: 4px;
-        }
+        }}
 
-        .methodology ul, .methodology ol {
+        .methodology ul, .methodology ol {{
             margin-left: 20px;
             margin-top: 4px;
-        }
+        }}
 
-        .methodology li {
+        .methodology li {{
             margin-bottom: 3px;
-        }
+        }}
 
-        img {
+        img {{
             max-width: 100%;
             height: auto;
             border: 1px solid #999;
             margin: 8px 0;
             cursor: pointer;
             transition: transform 0.2s;
-        }
+        }}
 
-        img:hover {
+        img:hover {{
             transform: scale(1.02);
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
+        }}
 
-        .slider-container {
+        .slider-container {{
             margin: 12px 0;
-        }
+        }}
 
-        .slider-label {
+        .slider-label {{
             font-weight: bold;
             display: block;
             margin-bottom: 4px;
-        }
+        }}
 
-        .slider {
+        .slider {{
             width: 100%;
             height: 6px;
             border-radius: 3px;
             background: #ddd;
             outline: none;
-        }
+        }}
 
-        .slider-value {
+        .slider-value {{
             display: inline-block;
             min-width: 60px;
             font-weight: bold;
             margin-left: 10px;
-        }
+        }}
 
-        .projection-result {
+        .projection-result {{
             background: #f0f0f0;
             border: 2px solid #666;
             padding: 15px;
             margin: 15px 0;
             text-align: center;
-        }
+        }}
 
-        .projection-value {
+        .projection-value {{
             font-size: 24pt;
             font-weight: bold;
             color: #000;
             margin: 10px 0;
-        }
+        }}
 
-        .note {
+        .note {{
             font-size: 8.5pt;
             font-style: italic;
             color: #555;
             margin-top: 4px;
-        }
+        }}
 
         /* Modal for images */
-        .modal {
+        .modal {{
             display: none;
             position: fixed;
             z-index: 1000;
@@ -208,9 +273,9 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0,0,0,0.9);
-        }
+        }}
 
-        .modal-content {
+        .modal-content {{
             margin: auto;
             display: block;
             max-width: 95%;
@@ -219,9 +284,9 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-        }
+        }}
 
-        .close {
+        .close {{
             position: absolute;
             top: 15px;
             right: 35px;
@@ -229,33 +294,33 @@
             font-size: 40px;
             font-weight: bold;
             cursor: pointer;
-        }
+        }}
 
-        .close:hover {
+        .close:hover {{
             color: #bbb;
-        }
+        }}
 
-        .top-variables-box {
+        .top-variables-box {{
             background: #fff8dc;
             border: 2px solid #daa520;
             padding: 12px;
             margin: 10px 0;
             border-radius: 4px;
-        }
+        }}
 
-        .top-variables-box h3 {
+        .top-variables-box h3 {{
             color: #b8860b;
             margin-bottom: 8px;
-        }
+        }}
 
-        .top-variables-box ol {
+        .top-variables-box ol {{
             margin-left: 20px;
-        }
+        }}
 
-        .top-variables-box li {
+        .top-variables-box li {{
             margin-bottom: 3px;
             font-size: 9pt;
-        }
+        }}
     </style>
 </head>
 <body>
@@ -263,7 +328,7 @@
         <h1>GDP Per Capita Growth Analysis - Entrepreneurship & Gender Indicators</h1>
         <div class="subtitle">
             Gender, Entrepreneurship & Economic Development | 52 Countries | 131 Variables<br>
-            Analysis Date: 04 November 2025
+            Analysis Date: {current_date}
         </div>
     </div>
 
@@ -277,8 +342,8 @@
     <div class="tab-content" id="tab-0">
         <div class="summary">
             <strong>Target Variable:</strong> G_GPD_PCAP_SLOPE (GDP per capita growth trajectory)<br>
-            <strong>Best Model:</strong> Random Forest | R² = 0.760 | RMSE = 12.60<br>
-            <strong>Validation:</strong> 5-fold CV R² = 0.215 | Bootstrap 95% CI: [0.469, 0.911]
+            <strong>Best Model:</strong> {best_name} | R² = {best_res['r2']:.3f} | RMSE = {best_res['rmse']:.2f}<br>
+            <strong>Validation:</strong> 5-fold CV R² = {best_res['cv']:.3f} | Bootstrap 95% CI: [{bootstrap_ci_low:.3f}, {bootstrap_ci_high:.3f}]
         </div>
 
         <div class="methodology">
@@ -310,10 +375,10 @@
             <h3>4. Recursive Hyperparameter Optimization (Random Forest)</h3>
             <p style="margin-left: 20px; font-size: 9pt;">
             Parameters optimized sequentially via 5-fold cross-validation:<br>
-            (1) <strong>n_estimators</strong> ∈ {50, 100, 200, 300} → best value selected<br>
-            (2) <strong>max_depth</strong> ∈ {10, 20, 30, None} → best value selected<br>
-            (3) <strong>min_samples_split</strong> ∈ {2, 5, 10} → best value selected<br>
-            (4) <strong>min_samples_leaf</strong> ∈ {1, 2, 4} → best value selected<br>
+            (1) <strong>n_estimators</strong> ∈ {{50, 100, 200, 300}} → best value selected<br>
+            (2) <strong>max_depth</strong> ∈ {{10, 20, 30, None}} → best value selected<br>
+            (3) <strong>min_samples_split</strong> ∈ {{2, 5, 10}} → best value selected<br>
+            (4) <strong>min_samples_leaf</strong> ∈ {{1, 2, 4}} → best value selected<br>
             <br>
             At each level, only parameters showing CV improvement are retained before recursing to next level.
             Process stops when no improvement found or maximum recursion depth reached.
@@ -323,7 +388,7 @@
             <ul>
                 <li><strong>5-Fold Cross-Validation:</strong> Stratified K-fold to assess generalization</li>
                 <li><strong>Bootstrap Resampling:</strong> 100 iterations for confidence intervals</li>
-                <li><strong>Residual Analysis:</strong> Shapiro-Wilk test for normality (p=0.1182)</li>
+                <li><strong>Residual Analysis:</strong> Shapiro-Wilk test for normality (p={shapiro_p:.4f})</li>
                 <li><strong>SHAP Analysis:</strong> Feature importance and contribution to predictions</li>
             </ul>
 
@@ -349,52 +414,33 @@
                 <th style="width: 60px;">MAE</th>
                 <th style="width: 70px;">CV R²</th>
             </tr>
-            <tr class="best">
-                <td style="text-align: center;">1</td>
-                <td>Random Forest</td>
-                <td>0.7605</td>
-                <td>12.60</td>
-                <td>8.68</td>
-                <td>0.2148</td>
+"""
+
+for i, (name, model_res) in enumerate(top3, 1):
+    row_class = "best" if i == 1 else ""
+    html += f"""            <tr class="{row_class}">
+                <td style="text-align: center;">{i}</td>
+                <td>{name}</td>
+                <td>{model_res['r2']:.4f}</td>
+                <td>{model_res['rmse']:.2f}</td>
+                <td>{model_res['mae']:.2f}</td>
+                <td>{model_res['cv']:.4f}</td>
             </tr>
-            <tr class="">
-                <td style="text-align: center;">2</td>
-                <td>Gradient Boosting</td>
-                <td>0.7040</td>
-                <td>14.01</td>
-                <td>10.54</td>
-                <td>-0.0340</td>
-            </tr>
-            <tr class="">
-                <td style="text-align: center;">3</td>
-                <td>XGBoost</td>
-                <td>0.6461</td>
-                <td>15.32</td>
-                <td>11.14</td>
-                <td>0.0357</td>
-            </tr>
-        </table>
+"""
+
+html += """        </table>
         <p class="note">Models ranked by test R². Best model highlighted. CV R² measures cross-validation performance.</p>
 
         <div class="top-variables-box">
             <h3>Top 15 Most Important Variables (SHAP Analysis)</h3>
             <ol>
-                <li>H_Cause of death, by injury, ages 15-59, female (% of female populatio... (importance: 11.801)</li>
-                <li>H_Cause of death, by injury, female (% of female population) (importance: 4.170)</li>
-                <li>H_Cause of death, by communicable diseases and maternal, prenatal and ... (importance: 2.430)</li>
-                <li>E_School enrollment, primary, female (% gross) (importance: 1.840)</li>
-                <li>H_Lifetime risk of maternal death (%) (importance: 1.329)</li>
-                <li>H_Prevalence of obesity, female (% of female population ages 18+) (importance: 0.536)</li>
-                <li>P_Fertility rate, total (births per woman) (importance: 0.381)</li>
-                <li>H_Cause of death, by communicable diseases and maternal, prenatal and ... (importance: 0.259)</li>
-                <li>H_Cause of death, by non-communicable diseases, ages 15-59, female (% ... (importance: 0.110)</li>
-                <li>H_Cause of death, by injury, ages 0-4, female (% of female population ... (importance: 0.094)</li>
-                <li>H_Cause of death, by communicable diseases and maternal, prenatal and ... (importance: 0.066)</li>
-                <li>H_Cause of death, by communicable diseases and maternal, prenatal and ... (importance: 0.061)</li>
-                <li>H_Cause of death, by injury, ages 5-14, female (% of female population... (importance: 0.058)</li>
-                <li>H_Cause of death, by communicable diseases and maternal, prenatal and ... (importance: 0.057)</li>
-                <li>H_Cause of death, by non-communicable diseases, ages 60+, female (% of... (importance: 0.035)</li>
-            </ol>
+"""
+
+for idx, row in shap_top15.iterrows():
+    var_short = row['Variable'][:70] + '...' if len(row['Variable']) > 70 else row['Variable']
+    html += f'                <li>{var_short} (importance: {row["Importance"]:.3f})</li>\n'
+
+html += """            </ol>
             <p class="note">SHAP (SHapley Additive exPlanations) values quantify each feature's contribution to model predictions.
             Importance = mean absolute SHAP value across all predictions.</p>
         </div>
@@ -452,117 +498,23 @@
                 <th>75%</th>
                 <th>Max</th>
             </tr>
-            <tr>
-                <td style="font-size: 8pt;">H_Cause of death, by injury, ages 15-59, female (%...</td>
-                <td>0.05</td>
-                <td>0.16</td>
-                <td>-0.31</td>
-                <td>-0.01</td>
-                <td>0.06</td>
-                <td>0.16</td>
-                <td>0.48</td>
+"""
+
+for var, row in desc_stats.head(11).iterrows():
+    var_short = var[:50] + '...' if len(var) > 50 else var
+    html += f"""            <tr>
+                <td style="font-size: 8pt;">{var_short}</td>
+                <td>{row['mean']:.2f}</td>
+                <td>{row['std']:.2f}</td>
+                <td>{row['min']:.2f}</td>
+                <td>{row['25%']:.2f}</td>
+                <td>{row['50%']:.2f}</td>
+                <td>{row['75%']:.2f}</td>
+                <td>{row['max']:.2f}</td>
             </tr>
-            <tr>
-                <td style="font-size: 8pt;">H_Cause of death, by injury, female (% of female p...</td>
-                <td>0.06</td>
-                <td>0.11</td>
-                <td>-0.18</td>
-                <td>-0.02</td>
-                <td>0.07</td>
-                <td>0.11</td>
-                <td>0.42</td>
-            </tr>
-            <tr>
-                <td style="font-size: 8pt;">H_Cause of death, by communicable diseases and mat...</td>
-                <td>-0.75</td>
-                <td>0.44</td>
-                <td>-1.75</td>
-                <td>-1.10</td>
-                <td>-0.70</td>
-                <td>-0.42</td>
-                <td>-0.01</td>
-            </tr>
-            <tr>
-                <td style="font-size: 8pt;">H_Cause of death, by communicable diseases and mat...</td>
-                <td>-0.34</td>
-                <td>0.22</td>
-                <td>-0.84</td>
-                <td>-0.50</td>
-                <td>-0.33</td>
-                <td>-0.19</td>
-                <td>0.07</td>
-            </tr>
-            <tr>
-                <td style="font-size: 8pt;">E_School enrollment, primary, female (% gross)</td>
-                <td>1.03</td>
-                <td>0.85</td>
-                <td>-0.37</td>
-                <td>0.41</td>
-                <td>0.99</td>
-                <td>1.62</td>
-                <td>2.70</td>
-            </tr>
-            <tr>
-                <td style="font-size: 8pt;">H_Cause of death, by non-communicable diseases, ag...</td>
-                <td>0.31</td>
-                <td>0.20</td>
-                <td>-0.10</td>
-                <td>0.14</td>
-                <td>0.30</td>
-                <td>0.46</td>
-                <td>0.78</td>
-            </tr>
-            <tr>
-                <td style="font-size: 8pt;">H_Prevalence of obesity, female (% of female popul...</td>
-                <td>0.29</td>
-                <td>0.15</td>
-                <td>0.10</td>
-                <td>0.18</td>
-                <td>0.25</td>
-                <td>0.36</td>
-                <td>0.69</td>
-            </tr>
-            <tr>
-                <td style="font-size: 8pt;">P_Fertility rate, total (births per woman)</td>
-                <td>-0.05</td>
-                <td>0.03</td>
-                <td>-0.10</td>
-                <td>-0.08</td>
-                <td>-0.05</td>
-                <td>-0.03</td>
-                <td>0.00</td>
-            </tr>
-            <tr>
-                <td style="font-size: 8pt;">H_Cause of death, by non-communicable diseases, ag...</td>
-                <td>0.70</td>
-                <td>0.35</td>
-                <td>0.03</td>
-                <td>0.43</td>
-                <td>0.67</td>
-                <td>0.90</td>
-                <td>1.43</td>
-            </tr>
-            <tr>
-                <td style="font-size: 8pt;">H_Cause of death, by injury, ages 5-14, female (% ...</td>
-                <td>0.22</td>
-                <td>0.32</td>
-                <td>-0.46</td>
-                <td>0.05</td>
-                <td>0.22</td>
-                <td>0.38</td>
-                <td>1.52</td>
-            </tr>
-            <tr>
-                <td style="font-size: 8pt;">H_Cause of death, by communicable diseases and mat...</td>
-                <td>-0.92</td>
-                <td>0.40</td>
-                <td>-1.79</td>
-                <td>-1.20</td>
-                <td>-0.93</td>
-                <td>-0.63</td>
-                <td>-0.14</td>
-            </tr>
-        </table>
+"""
+
+html += """        </table>
         <p class="note">Statistics computed from available data (n=52 countries). All variables standardized (mean=0, std=1) during modeling.</p>
 
         <h2>Correlation Analysis</h2>
@@ -575,112 +527,21 @@
                 <th>P-value</th>
                 <th>Significance</th>
             </tr>
-            <tr>
-                <td>1</td>
-                <td style="font-size: 8pt;">H_Cause of death, by injury, ages 15-59, female (%...</td>
-                <td style="text-align: right;">-0.6029</td>
-                <td style="text-align: right;">0.0000</td>
-                <td style="text-align: center;">***</td>
+"""
+
+for i, (_, row) in enumerate(corr_df.head(15).iterrows(), 1):
+    var_short = row['Variable'][:50] + '...' if len(row['Variable']) > 50 else row['Variable']
+    sig = "***" if row['P_value'] < 0.001 else "**" if row['P_value'] < 0.01 else "*" if row['P_value'] < 0.05 else "ns"
+    html += f"""            <tr>
+                <td>{i}</td>
+                <td style="font-size: 8pt;">{var_short}</td>
+                <td style="text-align: right;">{row['Correlation']:.4f}</td>
+                <td style="text-align: right;">{row['P_value']:.4f}</td>
+                <td style="text-align: center;">{sig}</td>
             </tr>
-            <tr>
-                <td>2</td>
-                <td style="font-size: 8pt;">H_Cause of death, by injury, female (% of female p...</td>
-                <td style="text-align: right;">-0.5965</td>
-                <td style="text-align: right;">0.0000</td>
-                <td style="text-align: center;">***</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td style="font-size: 8pt;">H_Cause of death, by communicable diseases and mat...</td>
-                <td style="text-align: right;">0.5397</td>
-                <td style="text-align: right;">0.0000</td>
-                <td style="text-align: center;">***</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td style="font-size: 8pt;">H_Cause of death, by communicable diseases and mat...</td>
-                <td style="text-align: right;">0.5136</td>
-                <td style="text-align: right;">0.0001</td>
-                <td style="text-align: center;">***</td>
-            </tr>
-            <tr>
-                <td>5</td>
-                <td style="font-size: 8pt;">E_School enrollment, primary, female (% gross)</td>
-                <td style="text-align: right;">-0.4796</td>
-                <td style="text-align: right;">0.0003</td>
-                <td style="text-align: center;">***</td>
-            </tr>
-            <tr>
-                <td>6</td>
-                <td style="font-size: 8pt;">H_Cause of death, by non-communicable diseases, ag...</td>
-                <td style="text-align: right;">-0.4766</td>
-                <td style="text-align: right;">0.0004</td>
-                <td style="text-align: center;">***</td>
-            </tr>
-            <tr>
-                <td>7</td>
-                <td style="font-size: 8pt;">H_Prevalence of obesity, female (% of female popul...</td>
-                <td style="text-align: right;">0.4512</td>
-                <td style="text-align: right;">0.0008</td>
-                <td style="text-align: center;">***</td>
-            </tr>
-            <tr>
-                <td>8</td>
-                <td style="font-size: 8pt;">P_Fertility rate, total (births per woman)</td>
-                <td style="text-align: right;">-0.4279</td>
-                <td style="text-align: right;">0.0016</td>
-                <td style="text-align: center;">**</td>
-            </tr>
-            <tr>
-                <td>9</td>
-                <td style="font-size: 8pt;">H_Cause of death, by non-communicable diseases, ag...</td>
-                <td style="text-align: right;">-0.4066</td>
-                <td style="text-align: right;">0.0028</td>
-                <td style="text-align: center;">**</td>
-            </tr>
-            <tr>
-                <td>10</td>
-                <td style="font-size: 8pt;">H_Cause of death, by injury, ages 5-14, female (% ...</td>
-                <td style="text-align: right;">-0.3828</td>
-                <td style="text-align: right;">0.0051</td>
-                <td style="text-align: center;">**</td>
-            </tr>
-            <tr>
-                <td>11</td>
-                <td style="font-size: 8pt;">H_Cause of death, by communicable diseases and mat...</td>
-                <td style="text-align: right;">0.3522</td>
-                <td style="text-align: right;">0.0104</td>
-                <td style="text-align: center;">*</td>
-            </tr>
-            <tr>
-                <td>12</td>
-                <td style="font-size: 8pt;">H_Cause of death, by injury, ages 0-4, female (% o...</td>
-                <td style="text-align: right;">-0.3133</td>
-                <td style="text-align: right;">0.0237</td>
-                <td style="text-align: center;">*</td>
-            </tr>
-            <tr>
-                <td>13</td>
-                <td style="font-size: 8pt;">H_Lifetime risk of maternal death (%)</td>
-                <td style="text-align: right;">0.3121</td>
-                <td style="text-align: right;">0.0243</td>
-                <td style="text-align: center;">*</td>
-            </tr>
-            <tr>
-                <td>14</td>
-                <td style="font-size: 8pt;">H_Cause of death, by communicable diseases and mat...</td>
-                <td style="text-align: right;">0.3082</td>
-                <td style="text-align: right;">0.0262</td>
-                <td style="text-align: center;">*</td>
-            </tr>
-            <tr>
-                <td>15</td>
-                <td style="font-size: 8pt;">H_Cause of death, by communicable diseases and mat...</td>
-                <td style="text-align: right;">0.3075</td>
-                <td style="text-align: right;">0.0266</td>
-                <td style="text-align: center;">*</td>
-            </tr>
-        </table>
+"""
+
+html += """        </table>
         <p class="note">Significance: *** p<0.001, ** p<0.01, * p<0.05, ns = not significant.
         Pearson r measures linear association strength and direction.</p>
     </div>
@@ -694,7 +555,33 @@
             <strong>Instructions:</strong> Move sliders to adjust variable values. The projection updates based on
             the trained model using actual relationships from 52 countries.
         </div>
+"""
 
+# Get top 5 most important variables
+if 'importance' in best_res:
+    import pandas as pd
+    importance_df = pd.DataFrame(list(best_res['importance'].items()),
+                                columns=['Variable', 'Importance'])
+    importance_df = importance_df.sort_values('Importance', ascending=False).head(5)
+
+    for _, row in importance_df.iterrows():
+        var = row['Variable']
+        var_short = var[:60]
+        var_data = df[var].dropna()
+        min_val = float(var_data.min())
+        max_val = float(var_data.max())
+        mean_val = float(var_data.mean())
+
+        html += f"""
+        <div class="slider-container">
+            <label class="slider-label">{var_short}</label>
+            <input type="range" class="slider" id="slider_{var}"
+                   min="{min_val}" max="{max_val}" value="{mean_val}" step="{(max_val-min_val)/100}">
+            <span class="slider-value" id="value_{var}">{mean_val:.2f}</span>
+        </div>
+"""
+
+html += """
         <div class="projection-result">
             <div style="font-size: 11pt; font-weight: bold;">Projected GDP Growth:</div>
             <div class="projection-value" id="projection-output">Adjust sliders to see projection</div>
@@ -706,10 +593,15 @@
         <div class="summary">
             <p><strong>Key Insights from Correlation Analysis:</strong></p>
             <ul style="margin-left: 20px; font-size: 9.5pt;">
-                <li><strong>H_Cause of death, by injury, ages 15-59, female (% of female:</strong> Decreases are associated with lower GDP growth (r=-0.603)</li>
-                <li><strong>H_Cause of death, by injury, female (% of female population):</strong> Decreases are associated with lower GDP growth (r=-0.596)</li>
-                <li><strong>H_Cause of death, by communicable diseases and maternal, pre:</strong> Increases are associated with higher GDP growth (r=0.540)</li>
-            </ul>
+"""
+
+# Add recommendations based on top correlations
+for i, (_, row) in enumerate(corr_df.head(3).iterrows(), 1):
+    var_short = row['Variable'][:60]
+    direction = "increase" if row['Correlation'] > 0 else "decrease"
+    html += f"                <li><strong>{var_short}:</strong> {direction.capitalize()}s are associated with {'higher' if row['Correlation'] > 0 else 'lower'} GDP growth (r={row['Correlation']:.3f})</li>\n"
+
+html += """            </ul>
             <p class="note" style="margin-top: 8px;">
             Recommendations based on statistical associations. Correlation does not imply causation.
             Policy interventions should consider local context, institutional capacity, and multi-sector coordination.
@@ -767,3 +659,16 @@
     </script>
 </body>
 </html>
+"""
+
+# Save
+with open('resultados/dashboard_complete.html', 'w', encoding='utf-8') as f:
+    f.write(html)
+
+print("Dashboard completo creado: resultados/dashboard_complete.html")
+print("- 3 pestanas: Analysis, Descriptive/Correlations, Policy Projections")
+print("- Imagenes ampliables al hacer clic")
+print("- Estilo academico compacto")
+print("- Metodologia detallada")
+print("- Top 15 variables destacadas")
+print("- Variables de validacion correctamente evaluadas")
