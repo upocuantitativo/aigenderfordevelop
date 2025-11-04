@@ -1,0 +1,16 @@
+Variable,Importance
+P_Female migrants (% of international migrant stock),10.291064
+"P_Adolescent fertility rate (births per 1,000 women ages 15-19)",5.930012
+"L_Employment in services, female (% of female employment) (modeled ILO estimate)",3.7408414
+"H_Cause of death, by communicable diseases and maternal, prenatal and nutrition conditions, ages 60+, female (% of female population ages 60+)",1.8383973
+"E_Primary completion rate, female (% of relevant age group)",1.3732928
+"H_Prevalence of overweight, weight for height, female (% of children under 5)",1.2043467
+"E_Primary education, teachers (% female)",0.94803274
+"E_School enrollment, secondary, female (% gross)",0.91419035
+"C_Urban population, female (% of total)",0.715705
+"L_Employment in agriculture, female (% of female employment) (modeled ILO estimate)",0.29402626
+"P_Life expectancy at age 60, female (years)",0.1823812
+"H_Prevalence of stunting, height for age, female (% of children under 5)",0.17106585
+"H_Prevalence of overweight, female (% of female adults)",0.04648709
+"H_Prevalence of obesity, female (% of female population ages 18+)",0.0039324486
+"H_Cause of death, by non-communicable diseases, ages 5-14, female (% of female population ages 5-14)",0.0037603846

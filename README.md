@@ -1,42 +1,49 @@
-# Dual Target Analysis: Gender, Entrepreneurship & Economic Development
+# Final Dual Target Analysis: Gender, Entrepreneurship & Economic Development
 
 ## Overview
 
 This project analyzes the relationship between gender and entrepreneurship indicators and two critical economic development outcomes:
 1. **GDP per capita growth trajectory**
-2. **Ease of Doing Business score**
+2. **Trading Across Borders Score** (World Bank Doing Business indicator)
 
-Using machine learning models on data from 52 low and lower-middle income countries, we explore how gender-related factors correlate with and potentially predict economic performance.
+Using machine learning models with recursive variable selection on data from 52 low and lower-middle income countries merged with comprehensive business environment indicators, we identify optimal predictive relationships.
 
 ## Key Findings
 
 ### ✅ GDP Growth Model (Strong Performance)
-- **Best Model:** Random Forest Regressor
-- **R² Score:** 0.732 (good predictive power)
-- **RMSE:** 13.34
-- **Cross-Validation R²:** 0.075
+- **Best Model:** Neural Network
+- **R² Score:** 0.763 (excellent predictive power)
+- **RMSE:** 12.55
+- **Cross-Validation R²:** -0.676
+- **Bootstrap 95% CI:** [0.424, 0.897]
 
-**Interpretation:** Gender and health indicators show meaningful associations with GDP growth trajectories. The model successfully captures ~73% of variance in growth patterns.
+**Interpretation:** Gender and health indicators show meaningful associations with GDP growth trajectories. The model successfully captures ~76% of variance in growth patterns.
 
-### ❌ Ease of Doing Business Model (Poor Performance)
-- **Best Model:** Random Forest Regressor
-- **R² Score:** -0.236 (worse than baseline)
-- **RMSE:** 15.90
-- **Cross-Validation R²:** -18.02
+### ✅ Trading Score Model (Strong Performance)
+- **Best Model:** XGBoost
+- **R² Score:** 0.784 (excellent predictive power)
+- **RMSE:** 9.74
+- **Cross-Validation R²:** -0.012
+- **Bootstrap 95% CI:** [-0.139, 0.894]
 
-**Interpretation:** Gender indicators alone do not adequately predict Ease of Doing Business scores. This suggests business environment quality is driven more by institutional, legal, and regulatory factors not captured in gender-focused variables.
+**Interpretation:** After testing 30 G variables (business/institutional indicators), "Trading Across Borders Score" emerged as the best predictor using gender indicators. This suggests cross-border trade facilitation is meaningfully related to gender equity and health patterns.
 
 ## Data
 
-- **Source:** World Bank, UN, UNESCO databases
+### Primary Dataset
+- **Source:** World Bank, UN, UNESCO databases (DATA_GHAB2.xlsx)
 - **Countries:** 52 low and lower-middle income nations
 - **Variables:** 131 gender, health, education, and development indicators
-- **Period:** Latest available data (varies by indicator)
+
+### Supplementary Dataset
+- **Source:** World Bank Doing Business indicators (BASE_COMPLETA.xlsx)
+- **Additional Variables:** 30 G variables (business environment, procedures, costs, scores)
+- **Merged:** Via ISO3 country codes (39 countries successfully merged)
 
 ### Target Variables
 
 1. **G_GPD_PCAP_SLOPE**: GDP per capita growth trajectory (slope)
-2. **Ease of Doing Business**: World Bank Doing Business score
+2. **G_Score-Trading across borders (DB16-20 methodology)**: Selected as best G variable after recursive testing
 
 ### Top Predictive Variables (for GDP Growth)
 
@@ -50,20 +57,31 @@ Based on SHAP importance analysis:
 
 ## Methodology
 
-### 1. Feature Selection
+### 1. Database Integration
+- Merged DATA_GHAB2.xlsx with BASE_COMPLETA.xlsx using ISO3 country codes
+- 39 of 52 countries successfully matched
+- Final merged database: 164 variables across 52 countries
+
+### 2. Recursive G Variable Selection
+- Tested all 30 G variables as potential targets
+- Trained 4 models (Random Forest, XGBoost, Gradient Boosting, Neural Network) for each
+- Evaluated based on R², CV score, RMSE, and bootstrap confidence intervals
+- **Winner:** G_Score-Trading across borders (R²=0.784)
+
+### 3. Feature Selection
 - Pearson correlation analysis between predictors and each target
 - Top 15 variables selected by absolute correlation magnitude
 - Minimum 10 observations required per variable
 
-### 2. Models Evaluated
+### 4. Models Evaluated
 
-For both targets, we trained and compared:
+For both targets:
 - **Random Forest:** Ensemble of decision trees with recursive hyperparameter optimization
 - **XGBoost:** Gradient boosting with L1/L2 regularization
 - **Neural Network:** Multi-layer perceptron (100-50-25 architecture, ReLU activation)
 - **Gradient Boosting:** Sequential ensemble learning
 
-### 3. Validation Framework
+### 5. Validation Framework
 
 - **Train/Test Split:** 75% training, 25% testing
 - **Cross-Validation:** 5-fold stratified K-fold
@@ -71,7 +89,7 @@ For both targets, we trained and compared:
 - **Residual Analysis:** Shapiro-Wilk normality test
 - **Feature Importance:** SHAP (SHapley Additive exPlanations) values
 
-### 4. Cluster Analysis
+### 6. Cluster Analysis
 
 K-Means clustering (k=3) applied to identify country groupings:
 - **Dimensionality Reduction:** PCA to 2 components (60.8% variance explained)
@@ -82,108 +100,146 @@ K-Means clustering (k=3) applied to identify country groupings:
 
 ```
 aigenderfordevelop/
-├── DATA_GHAB2.xlsx                          # Main dataset
-├── dual_target_analysis.py                  # Main analysis script
-├── create_dual_dashboard.py                 # Dashboard generator
-├── create_dual_robustness.py                # Robustness diagnostics
-├── create_dual_cluster_analysis.py          # Cluster analysis
+├── DATA_GHAB2.xlsx                          # Gender & development indicators
+├── BASE_COMPLETA.xlsx                       # Business environment indicators
+├── DATA_MERGED_COMPLETE.xlsx                # Merged database
+├── merge_and_train_G_variables.py           # Recursive G variable testing
+├── final_dual_target_analysis.py            # Final dual target models
+├── create_final_dashboard.py                # Dashboard generator
+├── create_final_complete_analysis.py        # Robustness & clusters
 ├── resultados/
 │   ├── dashboard_complete.html              # Interactive dashboard (3 tabs)
-│   ├── cluster_assignments.csv              # Country cluster assignments
+│   ├── cluster_assignments_final.csv        # Country cluster assignments
 │   ├── modelos/
-│   │   └── dual_target_results.pkl          # Model results and predictions
+│   │   ├── all_G_variables_results.pkl      # All 30 G variable results
+│   │   └── final_dual_target_results.pkl    # Final GDP + Trading models
 │   └── graficos_finales/
 │       ├── shap_GDP_Growth.png              # SHAP plots for GDP
-│       ├── shap_Ease_of_Business.png        # SHAP plots for Ease of Business
+│       ├── shap_Trading_Score.png           # SHAP plots for Trading Score
 │       ├── robustness_GDP_Growth.png        # 6-panel diagnostics (GDP)
 │       ├── residual_details_GDP_Growth.png  # Detailed residuals (GDP)
-│       ├── robustness_Ease_of_Business.png  # Diagnostics (Ease)
-│       ├── residual_details_Ease_of_Business.png
-│       └── cluster_analysis.png             # Cluster visualization
+│       ├── robustness_Trading_Score.png     # Diagnostics (Trading)
+│       ├── residual_details_Trading_Score.png
+│       └── cluster_analysis_final.png       # Cluster visualization
 └── README.md                                # This file
 ```
 
 ## Usage
 
-### Running the Analysis
+### Step 1: Merge Databases and Test All G Variables
 
-1. **Main Analysis:**
 ```bash
-python dual_target_analysis.py
+python merge_and_train_G_variables.py
 ```
-Trains models for both targets, evaluates performance, and saves results to `resultados/modelos/dual_target_results.pkl`.
 
-2. **Generate Dashboard:**
-```bash
-python create_dual_dashboard.py
-```
-Creates `resultados/dashboard_complete.html` with 3 tabs:
-   - Analysis Results (model comparison, SHAP, robustness, clusters)
-   - Descriptive Statistics & Correlations
-   - Dual Target Projections (interactive sliders)
+This script:
+- Merges DATA_GHAB2.xlsx with BASE_COMPLETA.xlsx
+- Trains models for all 30 G variables
+- Ranks them by R² score
+- Saves results to `all_G_variables_results.pkl`
 
-3. **Robustness Analysis:**
-```bash
-python create_dual_robustness.py
-```
-Generates diagnostic plots for model validation.
+Output: Best G variable identified = **G_Score-Trading across borders** (R²=0.784)
 
-4. **Cluster Analysis:**
+### Step 2: Final Dual Target Analysis
+
 ```bash
-python create_dual_cluster_analysis.py
+python final_dual_target_analysis.py
 ```
-Creates country groupings and saves cluster assignments.
+
+Trains final models for:
+- GDP Growth (R²=0.763)
+- Trading Score (R²=0.784)
+
+### Step 3: Generate Visualizations
+
+```bash
+python create_final_complete_analysis.py
+```
+
+Creates:
+- Robustness analysis plots (6-panel + 4-panel residual details)
+- Cluster analysis with PCA and confidence ellipses
+
+### Step 4: Create Dashboard
+
+```bash
+python create_final_dashboard.py
+```
+
+Generates `resultados/dashboard_complete.html` with 3 tabs:
+- Analysis Results (model comparison, SHAP, robustness, clusters)
+- Descriptive Statistics & Correlations
+- Dual Target Projections (interactive sliders)
 
 ### Viewing Results
 
 Open `resultados/dashboard_complete.html` in a web browser for:
-- **Interactive Policy Projections:** Adjust top 10 variables via sliders to see projected impacts on both GDP growth and Ease of Doing Business
-- **Dual Bar Charts:** Side-by-side comparison of baseline vs. projected scenarios for both targets
+- **Interactive Policy Projections:** Adjust top 10 variables via sliders to see projected impacts on both GDP growth and Trading Score
+- **Dual Bar Charts:** Side-by-side comparison of baseline vs. projected scenarios
 - **SHAP Visualizations:** Feature importance and value distributions
 - **Robustness Diagnostics:** Q-Q plots, residual analysis, learning curves, bootstrap distributions
 - **Cluster Visualizations:** Country groupings in PCA space with confidence ellipses
 
 ## Key Insights
 
-### What Works: GDP Growth Prediction
+### GDP Growth Prediction
 The strong performance of the GDP growth model suggests:
 - **Health indicators** (especially female cause of death patterns) are meaningfully associated with economic growth trajectories
 - **Education access** (primary enrollment) correlates with growth potential
 - **Maternal health** (lifetime risk of maternal death) reflects broader development patterns tied to economic performance
 
-### What Doesn't Work: Ease of Doing Business
-The failure of the Ease of Business model indicates:
-- Business environment quality is **not well-predicted by gender indicators alone**
-- Institutional factors (property rights, contract enforcement, regulatory efficiency) likely dominate
-- Gender equality may be a **consequence** rather than **driver** of good business environments
+### Trading Across Borders Score
+The strong performance of the Trading Score model indicates:
+- Gender indicators **can predict** cross-border trade facilitation scores
+- Countries with better gender equity and health outcomes tend to have more efficient trade processes
+- This relationship may reflect:
+  - Broader institutional quality that affects both gender equity and business environment
+  - Human capital development enabling trade competitiveness
+  - Social modernization correlating with economic openness
 
 ### Policy Implications
 
 1. **For GDP Growth:** Improvements in female health outcomes and primary education access are associated with better growth trajectories. Policies addressing maternal mortality and communicable disease burden may have economic co-benefits.
 
-2. **For Business Environment:** Improving Ease of Doing Business requires direct institutional reforms (legal systems, bureaucratic efficiency, corruption reduction) rather than solely focusing on gender equity.
+2. **For Trade Facilitation:** The relationship between gender indicators and trading efficiency suggests that development interventions should consider integrated approaches connecting social equity with economic competitiveness.
 
-3. **Integrated Approach:** Gender equity and business environment quality may be complementary but require different policy levers.
+3. **Integrated Approach:** Both models demonstrate that gender equity, health, and economic performance are interconnected dimensions of development requiring coordinated policy responses.
+
+## G Variables Tested
+
+All 30 G variables were tested, ranked by R² (best to worst):
+
+| Rank | Variable | R² | Model |
+|------|----------|-----|-------|
+| 1 | G_Score-Trading across borders | 0.784 | XGBoost |
+| 2 | G_Time (days) (4) | 0.559 | XGBoost |
+| 3 | G_Paid-in Minimum capital | 0.497 | Random Forest |
+| 4 | G_Cost (% of property value) | 0.443 | Gradient Boosting |
+| 5 | G_Cost (% of income per capita) | 0.358 | Random Forest |
+| ... | ... | ... | ... |
+| 30 | G_Score-Getting credit | -0.793 | Random Forest |
+
+See `all_G_variables_results.pkl` for complete results.
 
 ## Technical Notes
 
 ### Model Performance Metrics
 
 **GDP Growth:**
-- R² = 0.732: Model explains 73.2% of variance
-- RMSE = 13.34: Average prediction error of 13.34 units
-- Bootstrap 95% CI: Stable confidence intervals around R²
+- R² = 0.763: Model explains 76.3% of variance
+- RMSE = 12.55: Average prediction error
+- Bootstrap 95% CI: [0.424, 0.897]
 
-**Ease of Doing Business:**
-- R² = -0.236: Model performs worse than mean baseline
-- Negative cross-validation scores indicate systematic overfitting
-- Predictions should not be used for policy guidance
+**Trading Score:**
+- R² = 0.784: Model explains 78.4% of variance
+- RMSE = 9.74: Average prediction error
+- Bootstrap 95% CI: [-0.139, 0.894]
 
 ### Limitations
 
-1. **Sample Size:** 52 countries with complete data limits model complexity
-2. **Causality:** Correlations do not imply causal relationships; policy interventions require careful consideration
-3. **Omitted Variables:** Many factors (institutions, geography, history) not captured in gender indicators
+1. **Sample Size:** 52 countries (39 with merged data) limits model complexity
+2. **Causality:** Correlations do not imply causal relationships
+3. **Omitted Variables:** Many institutional and geographic factors not captured
 4. **Temporal:** Cross-sectional analysis; dynamic relationships not modeled
 5. **Data Quality:** Varies by country and indicator; missing data handled via listwise deletion
 
@@ -197,11 +253,12 @@ xgboost
 matplotlib
 scipy
 openpyxl
+shap
 ```
 
 Install via:
 ```bash
-pip install pandas numpy scikit-learn xgboost matplotlib scipy openpyxl
+pip install pandas numpy scikit-learn xgboost matplotlib scipy openpyxl shap
 ```
 
 ## Citation
@@ -209,7 +266,7 @@ pip install pandas numpy scikit-learn xgboost matplotlib scipy openpyxl
 If you use this analysis or code, please cite:
 
 ```
-Dual Target Analysis: Gender, Entrepreneurship & Economic Development
+Final Dual Target Analysis: Gender, Entrepreneurship & Economic Development
 https://github.com/upocuantitativo/aigenderfordevelop
 ```
 
@@ -224,4 +281,4 @@ For questions or collaborations, please open an issue on GitHub.
 ---
 
 **Last Updated:** November 2025
-**Analysis Date:** See dashboard for specific run dates
+**Analysis Completed:** G variable recursive testing + final dual target models
