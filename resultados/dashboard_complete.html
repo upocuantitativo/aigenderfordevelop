@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDP Growth Analysis - Complete Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 10pt;
+            line-height: 1.4;
+            color: #000;
+            background: #fff;
+        }
+
+        .header {
+            background: #f5f5f5;
+            border-bottom: 2px solid #000;
+            padding: 15px 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 16pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 9pt;
+            color: #555;
+        }
+
+        .tabs {
+            display: flex;
+            background: #e8e8e8;
+            border-bottom: 1px solid #999;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px 15px;
+            text-align: center;
+            cursor: pointer;
+            border-right: 1px solid #999;
+            font-weight: bold;
+            font-size: 9.5pt;
+            background: #e8e8e8;
+            transition: background 0.2s;
+        }
+
+        .tab:hover {
+            background: #d8d8d8;
+        }
+
+        .tab.active {
+            background: #fff;
+            border-bottom: 2px solid #fff;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 12pt;
+            font-weight: bold;
+            margin: 15px 0 8px 0;
+            border-bottom: 1px solid #666;
+            padding-bottom: 3px;
+        }
+
+        h3 {
+            font-size: 10.5pt;
+            font-weight: bold;
+            margin: 10px 0 5px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 9pt;
+        }
+
+        th {
+            background-color: #e8e8e8;
+            border: 1px solid #555;
+            padding: 4px 6px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            border: 1px solid #888;
+            padding: 4px 6px;
+        }
+
+        .best { background-color: #f5f5dc; font-weight: bold; }
+
+        .summary {
+            background-color: #f9f9f9;
+            border: 1px solid #666;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #999;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        img:hover {
+            transform: scale(1.02);
+        }
+
+        .slider-container {
+            margin: 12px 0;
+        }
+
+        .slider-label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+        }
+
+        .slider-value {
+            display: inline-block;
+            min-width: 60px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .projection-result {
+            background: #f0f0f0;
+            border: 2px solid #666;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .projection-value {
+            font-size: 24pt;
+            font-weight: bold;
+            color: #000;
+            margin: 10px 0;
+        }
+
+        .note {
+            font-size: 8.5pt;
+            font-style: italic;
+            color: #555;
+            margin-top: 4px;
+        }
+
+        /* Modal for images */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #bbb;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>GDP Per Capita Growth Analysis</h1>
+        <div class="subtitle">
+            Gender Indicators & Economic Development | 52 Countries | 131 Variables<br>
+            Analysis Date: 04 November 2025
+        </div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab(0)">Analysis Results</div>
+        <div class="tab" onclick="switchTab(1)">Descriptive Statistics & Correlations</div>
+        <div class="tab" onclick="switchTab(2)">Policy Projections</div>
+    </div>
+
+    <!-- TAB 1: Analysis Results -->
+    <div class="tab-content active" id="tab-0">
+        <div class="summary">
+            <strong>Target Variable:</strong> G_GPD_PCAP_SLOPE (GDP per capita growth trajectory)<br>
+            <strong>Best Model:</strong> Random Forest | R² = 0.760 | RMSE = 12.60<br>
+            <strong>Validation:</strong> 5-fold CV R² = 0.215 | Bootstrap 95% CI: [0.469, 0.911]
+        </div>
+
+        <h2>Model Comparison (Top 3)</h2>
+        <table>
+            <tr>
+                <th style="width: 40px;">Rank</th>
+                <th>Model</th>
+                <th style="width: 60px;">R²</th>
+                <th style="width: 60px;">RMSE</th>
+                <th style="width: 60px;">MAE</th>
+                <th style="width: 70px;">CV R²</th>
+            </tr>
+            <tr class="best">
+                <td style="text-align: center;">1</td>
+                <td>Random Forest</td>
+                <td>0.7605</td>
+                <td>12.60</td>
+                <td>8.68</td>
+                <td>0.2148</td>
+            </tr>
+            <tr class="">
+                <td style="text-align: center;">2</td>
+                <td>Gradient Boosting</td>
+                <td>0.7040</td>
+                <td>14.01</td>
+                <td>10.54</td>
+                <td>-0.0340</td>
+            </tr>
+            <tr class="">
+                <td style="text-align: center;">3</td>
+                <td>XGBoost</td>
+                <td>0.6461</td>
+                <td>15.32</td>
+                <td>11.14</td>
+                <td>0.0357</td>
+            </tr>
+        </table>
+        <p class="note">Models ranked by test R². Best model highlighted.</p>
+
+        <h2>SHAP Feature Importance Analysis</h2>
+        <p>Click image to enlarge.</p>
+        <img src="graficos_finales/shap_G_GPD_PCAP_SLOPE.png" alt="SHAP Analysis" onclick="openModal(this)">
+        <p class="note">SHAP values show feature contributions. Higher absolute values = greater importance.</p>
+
+        <h2>Robustness Analysis</h2>
+        <p>Comprehensive validation diagnostics for model reliability. Click to enlarge.</p>
+        <img src="graficos_finales/robustness_analysis.png" alt="Robustness Analysis" onclick="openModal(this)">
+        <p class="note">Six diagnostic plots: Q-Q plot (normality), residual distribution, predicted vs actual,
+        residuals vs predicted, cross-validation stability, and learning curve.</p>
+
+        <img src="graficos_finales/residual_details.png" alt="Detailed Residual Analysis" onclick="openModal(this)" style="margin-top: 10px;">
+        <p class="note">Detailed residual diagnostics: sequence plot, scale-location, bootstrap R² distribution, and influential points.</p>
+
+        <h2>Validation Statistics</h2>
+        <table>
+            <tr><th>Test</th><th>Value</th><th>Interpretation</th></tr>
+            <tr>
+                <td>Shapiro-Wilk</td>
+                <td>p = {res['validation']['shapiro_p']:.4f}</td>
+                <td>{"Residuals normal (p > 0.05)" if res['validation']['shapiro_p'] > 0.05 else "Non-normal residuals"}</td>
+            </tr>
+            <tr>
+                <td>Bootstrap Mean</td>
+                <td>R² = {res['validation']['bootstrap_r2_mean']:.4f}</td>
+                <td>Average across 100 resamples</td>
+            </tr>
+            <tr>
+                <td>Bootstrap 95% CI</td>
+                <td>[{res['validation']['bootstrap_ci'][0]:.4f}, {res['validation']['bootstrap_ci'][1]:.4f}]</td>
+                <td>Confidence interval for R²</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- TAB 2: Descriptive & Correlations -->
+    <div class="tab-content" id="tab-1">
+        <h2>Descriptive Statistics</h2>
+        <p>Summary statistics for target and top 15 predictive variables.</p>
+        <table>
+            <tr>
+                <th>Variable</th>
+                <th>Mean</th>
+                <th>Std</th>
+                <th>Min</th>
+                <th>25%</th>
+                <th>50%</th>
+                <th>75%</th>
+                <th>Max</th>
+            </tr>
+            <tr>
+                <td style="font-size: 8pt;">H_Cause of death, by injury, ages 15-59, female (%...</td>
+                <td>0.05</td>
+                <td>0.16</td>
+                <td>-0.31</td>
+                <td>-0.01</td>
+                <td>0.06</td>
+                <td>0.16</td>
+                <td>0.48</td>
+            </tr>
+            <tr>
+                <td style="font-size: 8pt;">H_Cause of death, by injury, female (% of female p...</td>
+                <td>0.06</td>
+                <td>0.11</td>
+                <td>-0.18</td>
+                <td>-0.02</td>
+                <td>0.07</td>
+                <td>0.11</td>
+                <td>0.42</td>
+            </tr>
+            <tr>
+                <td style="font-size: 8pt;">H_Cause of death, by communicable diseases and mat...</td>
+                <td>-0.75</td>
+                <td>0.44</td>
+                <td>-1.75</td>
+                <td>-1.10</td>
+                <td>-0.70</td>
+                <td>-0.42</td>
+                <td>-0.01</td>
+            </tr>
+            <tr>
+                <td style="font-size: 8pt;">H_Cause of death, by communicable diseases and mat...</td>
+                <td>-0.34</td>
+                <td>0.22</td>
+                <td>-0.84</td>
+                <td>-0.50</td>
+                <td>-0.33</td>
+                <td>-0.19</td>
+                <td>0.07</td>
+            </tr>
+            <tr>
+                <td style="font-size: 8pt;">E_School enrollment, primary, female (% gross)</td>
+                <td>1.03</td>
+                <td>0.85</td>
+                <td>-0.37</td>
+                <td>0.41</td>
+                <td>0.99</td>
+                <td>1.62</td>
+                <td>2.70</td>
+            </tr>
+            <tr>
+                <td style="font-size: 8pt;">H_Cause of death, by non-communicable diseases, ag...</td>
+                <td>0.31</td>
+                <td>0.20</td>
+                <td>-0.10</td>
+                <td>0.14</td>
+                <td>0.30</td>
+                <td>0.46</td>
+                <td>0.78</td>
+            </tr>
+            <tr>
+                <td style="font-size: 8pt;">H_Prevalence of obesity, female (% of female popul...</td>
+                <td>0.29</td>
+                <td>0.15</td>
+                <td>0.10</td>
+                <td>0.18</td>
+                <td>0.25</td>
+                <td>0.36</td>
+                <td>0.69</td>
+            </tr>
+            <tr>
+                <td style="font-size: 8pt;">P_Fertility rate, total (births per woman)</td>
+                <td>-0.05</td>
+                <td>0.03</td>
+                <td>-0.10</td>
+                <td>-0.08</td>
+                <td>-0.05</td>
+                <td>-0.03</td>
+                <td>0.00</td>
+            </tr>
+            <tr>
+                <td style="font-size: 8pt;">H_Cause of death, by non-communicable diseases, ag...</td>
+                <td>0.70</td>
+                <td>0.35</td>
+                <td>0.03</td>
+                <td>0.43</td>
+                <td>0.67</td>
+                <td>0.90</td>
+                <td>1.43</td>
+            </tr>
+            <tr>
+                <td style="font-size: 8pt;">H_Cause of death, by injury, ages 5-14, female (% ...</td>
+                <td>0.22</td>
+                <td>0.32</td>
+                <td>-0.46</td>
+                <td>0.05</td>
+                <td>0.22</td>
+                <td>0.38</td>
+                <td>1.52</td>
+            </tr>
+        </table>
+        <p class="note">Statistics computed from available data (n=52 countries).</p>
+
+        <h2>Correlation Analysis</h2>
+        <p>Pearson correlation coefficients between predictors and GDP growth.</p>
+        <table>
+            <tr>
+                <th>Rank</th>
+                <th>Variable</th>
+                <th>Correlation</th>
+                <th>P-value</th>
+                <th>Significance</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td style="font-size: 8pt;">H_Cause of death, by injury, ages 15-59, female (%...</td>
+                <td style="text-align: right;">-0.6029</td>
+                <td style="text-align: right;">0.0000</td>
+                <td style="text-align: center;">***</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td style="font-size: 8pt;">H_Cause of death, by injury, female (% of female p...</td>
+                <td style="text-align: right;">-0.5965</td>
+                <td style="text-align: right;">0.0000</td>
+                <td style="text-align: center;">***</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td style="font-size: 8pt;">H_Cause of death, by communicable diseases and mat...</td>
+                <td style="text-align: right;">0.5397</td>
+                <td style="text-align: right;">0.0000</td>
+                <td style="text-align: center;">***</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td style="font-size: 8pt;">H_Cause of death, by communicable diseases and mat...</td>
+                <td style="text-align: right;">0.5136</td>
+                <td style="text-align: right;">0.0001</td>
+                <td style="text-align: center;">***</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td style="font-size: 8pt;">E_School enrollment, primary, female (% gross)</td>
+                <td style="text-align: right;">-0.4796</td>
+                <td style="text-align: right;">0.0003</td>
+                <td style="text-align: center;">***</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td style="font-size: 8pt;">H_Cause of death, by non-communicable diseases, ag...</td>
+                <td style="text-align: right;">-0.4766</td>
+                <td style="text-align: right;">0.0004</td>
+                <td style="text-align: center;">***</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td style="font-size: 8pt;">H_Prevalence of obesity, female (% of female popul...</td>
+                <td style="text-align: right;">0.4512</td>
+                <td style="text-align: right;">0.0008</td>
+                <td style="text-align: center;">***</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td style="font-size: 8pt;">P_Fertility rate, total (births per woman)</td>
+                <td style="text-align: right;">-0.4279</td>
+                <td style="text-align: right;">0.0016</td>
+                <td style="text-align: center;">**</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td style="font-size: 8pt;">H_Cause of death, by non-communicable diseases, ag...</td>
+                <td style="text-align: right;">-0.4066</td>
+                <td style="text-align: right;">0.0028</td>
+                <td style="text-align: center;">**</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td style="font-size: 8pt;">H_Cause of death, by injury, ages 5-14, female (% ...</td>
+                <td style="text-align: right;">-0.3828</td>
+                <td style="text-align: right;">0.0051</td>
+                <td style="text-align: center;">**</td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td style="font-size: 8pt;">H_Cause of death, by communicable diseases and mat...</td>
+                <td style="text-align: right;">0.3522</td>
+                <td style="text-align: right;">0.0104</td>
+                <td style="text-align: center;">*</td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td style="font-size: 8pt;">H_Cause of death, by injury, ages 0-4, female (% o...</td>
+                <td style="text-align: right;">-0.3133</td>
+                <td style="text-align: right;">0.0237</td>
+                <td style="text-align: center;">*</td>
+            </tr>
+            <tr>
+                <td>13</td>
+                <td style="font-size: 8pt;">H_Lifetime risk of maternal death (%)</td>
+                <td style="text-align: right;">0.3121</td>
+                <td style="text-align: right;">0.0243</td>
+                <td style="text-align: center;">*</td>
+            </tr>
+            <tr>
+                <td>14</td>
+                <td style="font-size: 8pt;">H_Cause of death, by communicable diseases and mat...</td>
+                <td style="text-align: right;">0.3082</td>
+                <td style="text-align: right;">0.0262</td>
+                <td style="text-align: center;">*</td>
+            </tr>
+            <tr>
+                <td>15</td>
+                <td style="font-size: 8pt;">H_Cause of death, by communicable diseases and mat...</td>
+                <td style="text-align: right;">0.3075</td>
+                <td style="text-align: right;">0.0266</td>
+                <td style="text-align: center;">*</td>
+            </tr>
+        </table>
+        <p class="note">Significance: *** p<0.001, ** p<0.01, * p<0.05, ns = not significant.</p>
+    </div>
+
+    <!-- TAB 3: Policy Projections -->
+    <div class="tab-content" id="tab-2">
+        <h2>Policy Sensitivity Analysis</h2>
+        <p>Adjust key variables to project GDP growth impact. Based on {best_name} model (R²={best_res['r2']:.3f}).</p>
+
+        <div class="summary">
+            <strong>Instructions:</strong> Move sliders to adjust variable values. The projection updates based on
+            the trained model using actual relationships from 52 countries.
+        </div>
+
+        <div class="projection-result">
+            <div style="font-size: 11pt; font-weight: bold;">Projected GDP Growth:</div>
+            <div class="projection-value" id="projection-output">--</div>
+            <div class="note">Note: This is a statistical projection based on historical relationships.
+            Actual outcomes depend on many additional factors.</div>
+        </div>
+
+        <h3>Policy Recommendations</h3>
+        <div class="summary">
+            <p><strong>Key Insights:</strong></p>
+            <ul style="margin-left: 20px; font-size: 9.5pt;">
+                <li><strong>H_Cause of death, by injury, ages 15-59, female (% of female:</strong> Decreases are associated with lower GDP growth (r=-0.603)</li>
+                <li><strong>H_Cause of death, by injury, female (% of female population):</strong> Decreases are associated with lower GDP growth (r=-0.596)</li>
+                <li><strong>H_Cause of death, by communicable diseases and maternal, pre:</strong> Increases are associated with higher GDP growth (r=0.540)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Modal for images -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImg">
+    </div>
+
+    <script>
+        function switchTab(index) {
+            // Hide all tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+
+            // Show selected tab
+            document.querySelectorAll('.tab')[index].classList.add('active');
+            document.querySelectorAll('.tab-content')[index].classList.add('active');
+        }
+
+        function openModal(img) {
+            document.getElementById('imageModal').style.display = 'block';
+            document.getElementById('modalImg').src = img.src;
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // Slider updates
+        document.querySelectorAll('.slider').forEach(slider => {
+            slider.addEventListener('input', function() {
+                const valueSpan = document.getElementById('value_' + this.id.replace('slider_', ''));
+                valueSpan.textContent = parseFloat(this.value).toFixed(2);
+                updateProjection();
+            });
+        });
+
+        function updateProjection() {
+            // Simple weighted average projection (placeholder for actual model)
+            document.getElementById('projection-output').textContent =
+                'Model prediction requires backend API';
+        }
+
+        // ESC key to close modal
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
