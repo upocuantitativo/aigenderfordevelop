@@ -308,7 +308,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>Final Dual Target Analysis - Gender & Entrepreneurship</h1>
+        <h1>ROBUST Dual Target Analysis - Gender & Entrepreneurship</h1>
         <div class="subtitle">
             GDP Growth + G_Score-Trading across borders (DB16-20 methodology) | 52 Countries | 131 Variables<br>
             Analysis Date: 04 November 2025
@@ -329,21 +329,21 @@
             <div class="target-panel good">
                 <h3 style="margin-top: 0; color: #2e7d32;">Target 1: GDP Growth ✓</h3>
                 <strong>Variable:</strong> G_GPD_PCAP_SLOPE<br>
-                <strong>Best Model:</strong> Neural Network<br>
-                <strong>R²:</strong> 0.763 (Good fit)<br>
-                <strong>RMSE:</strong> 12.55<br>
-                <strong>CV R²:</strong> -0.676<br>
-                <strong>Bootstrap 95% CI:</strong> [0.424, 0.897]
+                <strong>Best Model:</strong> Random Forest<br>
+                <strong>R²:</strong> 0.745 (Good fit)<br>
+                <strong>RMSE:</strong> 13.01<br>
+                <strong>CV R²:</strong> 0.074<br>
+                <strong>Bootstrap 95% CI:</strong> [0.324, 0.903]
             </div>
 
             <div class="target-panel poor">
                 <h3 style="margin-top: 0; color: #c62828;">Target 2: G_Score-Trading across borders (DB16-20 methodology) ✗</h3>
                 <strong>Variable:</strong> G_Score-Trading across borders (DB16-20 methodology)<br>
-                <strong>Best Model:</strong> XGBoost<br>
-                <strong>R²:</strong> 0.784 (Poor fit)<br>
-                <strong>RMSE:</strong> 9.74<br>
-                <strong>CV R²:</strong> -0.012<br>
-                <strong>Bootstrap 95% CI:</strong> [-0.139, 0.894]
+                <strong>Best Model:</strong> Random Forest<br>
+                <strong>R²:</strong> 0.573 (Poor fit)<br>
+                <strong>RMSE:</strong> 13.68<br>
+                <strong>CV R²:</strong> 0.322<br>
+                <strong>Bootstrap 95% CI:</strong> [-0.415, 0.731]
                 <p class="note" style="margin-top: 8px; color: #c62828;">
                 <strong>Note:</strong> Negative R² indicates the model performs worse than a simple mean baseline.
                 The G_Score-Trading across borders (DB16-20 methodology) may not be well-predicted by gender indicators alone.
@@ -403,19 +403,19 @@
             </tr>
             <tr class="best">
                 <td style="text-align: center;">1</td>
-                <td>Neural Network</td>
-                <td>0.7626</td>
-                <td>12.55</td>
-                <td>9.68</td>
-                <td>-0.6763</td>
-            </tr>
-            <tr class="">
-                <td style="text-align: center;">2</td>
                 <td>Random Forest</td>
                 <td>0.7449</td>
                 <td>13.01</td>
                 <td>9.44</td>
                 <td>0.0742</td>
+            </tr>
+            <tr class="">
+                <td style="text-align: center;">2</td>
+                <td>Neural Network</td>
+                <td>0.7626</td>
+                <td>12.55</td>
+                <td>9.68</td>
+                <td>-0.6763</td>
             </tr>
             <tr class="">
                 <td style="text-align: center;">3</td>
@@ -439,6 +439,14 @@
             </tr>
             <tr class="poor">
                 <td style="text-align: center;">1</td>
+                <td>Random Forest</td>
+                <td>0.5729</td>
+                <td>13.68</td>
+                <td>10.48</td>
+                <td>0.3216</td>
+            </tr>
+            <tr class="poor">
+                <td style="text-align: center;">2</td>
                 <td>XGBoost</td>
                 <td>0.7837</td>
                 <td>9.74</td>
@@ -446,49 +454,41 @@
                 <td>-0.0120</td>
             </tr>
             <tr class="poor">
-                <td style="text-align: center;">2</td>
+                <td style="text-align: center;">3</td>
                 <td>Gradient Boosting</td>
                 <td>0.6119</td>
                 <td>13.04</td>
                 <td>11.02</td>
                 <td>-0.0376</td>
             </tr>
-            <tr class="poor">
-                <td style="text-align: center;">3</td>
-                <td>Random Forest</td>
-                <td>0.5729</td>
-                <td>13.68</td>
-                <td>10.48</td>
-                <td>0.3216</td>
-            </tr>
         </table>
         <p class="note">Note: All models for G_Score-Trading across borders (DB16-20 methodology) show poor performance (negative R²), indicating that gender indicators alone may not adequately predict this outcome.</p>
 
         <h2>SHAP Feature Importance - GDP Growth</h2>
         <p>Click image to enlarge.</p>
-        <img src="graficos_finales/shap_GDP_Growth.png" alt="SHAP GDP Growth" onclick="openModal(this)">
+        <img src="graficos_finales/shap_GDP_Growth_robust.png" alt="SHAP GDP Growth" onclick="openModal(this)">
 
         <h2>SHAP Feature Importance - G_Score-Trading across borders (DB16-20 methodology)</h2>
         <p>Click image to enlarge.</p>
-        <img src="graficos_finales/shap_Trading_Score.png" alt="SHAP Trading Score" onclick="openModal(this)">
+        <img src="graficos_finales/shap_Trading_Score_robust.png" alt="SHAP Trading Score" onclick="openModal(this)">
 
         <h2>Robustness Analysis - GDP Growth</h2>
         <p>Comprehensive validation diagnostics. Click to enlarge.</p>
-        <img src="graficos_finales/robustness_GDP_Growth.png" alt="Robustness GDP" onclick="openModal(this)">
+        <img src="graficos_finales/robustness_robust_GDP_Growth.png" alt="Robustness GDP" onclick="openModal(this)">
         <p class="note">Six diagnostic plots: Q-Q plot (normality), residual distribution, predicted vs actual,
         residuals vs predicted, cross-validation stability, and learning curve.</p>
 
-        <img src="graficos_finales/residual_details_GDP_Growth.png" alt="Residual Details GDP" onclick="openModal(this)" style="margin-top: 10px;">
+        <img src="graficos_finales/residual_details_robust_GDP_Growth.png" alt="Residual Details GDP" onclick="openModal(this)" style="margin-top: 10px;">
         <p class="note">Detailed residual diagnostics: sequence plot, scale-location, bootstrap R² distribution, and standardized residuals.</p>
 
         <h2>Robustness Analysis - G_Score-Trading across borders (DB16-20 methodology)</h2>
         <p>Diagnostic plots for Trading Score model (note poor model fit). Click to enlarge.</p>
-        <img src="graficos_finales/robustness_Trading_Score.png" alt="Robustness Ease" onclick="openModal(this)">
-        <img src="graficos_finales/residual_details_Trading_Score.png" alt="Residual Details Ease" onclick="openModal(this)" style="margin-top: 10px;">
+        <img src="graficos_finales/robustness_robust_Trading_Score.png" alt="Robustness Ease" onclick="openModal(this)">
+        <img src="graficos_finales/residual_details_robust_Trading_Score.png" alt="Residual Details Ease" onclick="openModal(this)" style="margin-top: 10px;">
 
         <h2>Cluster Analysis</h2>
         <p>Country groupings based on gender and development indicators. Click to enlarge.</p>
-        <img src="graficos_finales/cluster_analysis_final.png" alt="Cluster Analysis" onclick="openModal(this)">
+        <img src="graficos_finales/cluster_analysis_final_robust.png" alt="Cluster Analysis" onclick="openModal(this)">
         <p class="note">Left: Country clusters visualized in 2D PCA space with confidence ellipses.
         Right: Cluster characteristics heatmap showing standardized values for top 10 variables.
         Countries with similar development patterns are grouped together.</p>
@@ -805,29 +805,11 @@
             <div class="sliders-column">
                 <h3 style="margin-top: 0;">Top 10 Predictive Variables (GDP Growth)</h3>
                 <div class="slider-container">
-                    <label class="slider-label">E_School enrollment, primary, female (% gross)</label>
-                    <div class="slider-row">
-                        <input type="range" class="slider" id="slider_E_School_enrollment_primary_female_pct_gross"
-                               min="-0.3722776929583235" max="2.698265894377604" value="1.0294606910520079" step="0.030705435873359277"
-                               data-importance="8.9961">
-                        <span class="slider-value" id="value_E_School_enrollment_primary_female_pct_gross">1.03</span>
-                    </div>
-                </div>
-                <div class="slider-container">
-                    <label class="slider-label">H_Cause of death, by communicable diseases and maternal</label>
-                    <div class="slider-row">
-                        <input type="range" class="slider" id="slider_H_Cause_of_death_by_communicable_diseases_and_mate"
-                               min="-1.747681670818434" max="-0.00563636007528562" value="-0.7505843199981419" step="0.017420453107431483"
-                               data-importance="6.9013">
-                        <span class="slider-value" id="value_H_Cause_of_death_by_communicable_diseases_and_mate">-0.75</span>
-                    </div>
-                </div>
-                <div class="slider-container">
                     <label class="slider-label">H_Cause of death, by injury, ages 15-59, female (% of f</label>
                     <div class="slider-row">
                         <input type="range" class="slider" id="slider_H_Cause_of_death_by_injury_ages_15_59_female_pct_o"
                                min="-0.3104489380048813" max="0.481530485667031" value="0.054295619960704575" step="0.007919794236719123"
-                               data-importance="5.5527">
+                               data-importance="11.0176">
                         <span class="slider-value" id="value_H_Cause_of_death_by_injury_ages_15_59_female_pct_o">0.05</span>
                     </div>
                 </div>
@@ -836,8 +818,35 @@
                     <div class="slider-row">
                         <input type="range" class="slider" id="slider_H_Cause_of_death_by_injury_female_pct_of_female_po"
                                min="-0.1797407368177527" max="0.4160598881935708" value="0.05524071539856293" step="0.005958006250113235"
-                               data-importance="3.5854">
+                               data-importance="4.5002">
                         <span class="slider-value" id="value_H_Cause_of_death_by_injury_female_pct_of_female_po">0.06</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label class="slider-label">H_Cause of death, by communicable diseases and maternal</label>
+                    <div class="slider-row">
+                        <input type="range" class="slider" id="slider_H_Cause_of_death_by_communicable_diseases_and_mate"
+                               min="-1.747681670818434" max="-0.00563636007528562" value="-0.7505843199981419" step="0.017420453107431483"
+                               data-importance="3.6709">
+                        <span class="slider-value" id="value_H_Cause_of_death_by_communicable_diseases_and_mate">-0.75</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label class="slider-label">E_School enrollment, primary, female (% gross)</label>
+                    <div class="slider-row">
+                        <input type="range" class="slider" id="slider_E_School_enrollment_primary_female_pct_gross"
+                               min="-0.3722776929583235" max="2.698265894377604" value="1.0294606910520079" step="0.030705435873359277"
+                               data-importance="1.3303">
+                        <span class="slider-value" id="value_E_School_enrollment_primary_female_pct_gross">1.03</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label class="slider-label">H_Lifetime risk of maternal death (%)</label>
+                    <div class="slider-row">
+                        <input type="range" class="slider" id="slider_H_Lifetime_risk_of_maternal_death_pct"
+                               min="-0.4354578318895237" max="0.01247590718174101" value="-0.08471123832290163" step="0.004479337390712647"
+                               data-importance="0.9412">
+                        <span class="slider-value" id="value_H_Lifetime_risk_of_maternal_death_pct">-0.08</span>
                     </div>
                 </div>
                 <div class="slider-container">
@@ -845,35 +854,8 @@
                     <div class="slider-row">
                         <input type="range" class="slider" id="slider_H_Prevalence_of_obesity_female_pct_of_female_popul"
                                min="0.1028603840855684" max="0.6924965561947979" value="0.28946507264714866" step="0.0058963617210922945"
-                               data-importance="3.4978">
+                               data-importance="0.8408">
                         <span class="slider-value" id="value_H_Prevalence_of_obesity_female_pct_of_female_popul">0.29</span>
-                    </div>
-                </div>
-                <div class="slider-container">
-                    <label class="slider-label">H_Cause of death, by non-communicable diseases, ages 60</label>
-                    <div class="slider-row">
-                        <input type="range" class="slider" id="slider_H_Cause_of_death_by_non_communicable_diseases_ages"
-                               min="-0.09998401465531963" max="0.7810512093641936" value="0.3138611165493224" step="0.008810352240195132"
-                               data-importance="3.1097">
-                        <span class="slider-value" id="value_H_Cause_of_death_by_non_communicable_diseases_ages">0.31</span>
-                    </div>
-                </div>
-                <div class="slider-container">
-                    <label class="slider-label">H_Cause of death, by communicable diseases and maternal</label>
-                    <div class="slider-row">
-                        <input type="range" class="slider" id="slider_H_Cause_of_death_by_communicable_diseases_and_mate"
-                               min="-1.795612359553516" max="0.6800901714308327" value="-0.47694757050050474" step="0.02475702530984349"
-                               data-importance="2.4464">
-                        <span class="slider-value" id="value_H_Cause_of_death_by_communicable_diseases_and_mate">-0.48</span>
-                    </div>
-                </div>
-                <div class="slider-container">
-                    <label class="slider-label">H_Cause of death, by communicable diseases and maternal</label>
-                    <div class="slider-row">
-                        <input type="range" class="slider" id="slider_H_Cause_of_death_by_communicable_diseases_and_mate"
-                               min="-0.8425538784071129" max="0.07069606258786797" value="-0.3391882586522482" step="0.009132499409949809"
-                               data-importance="2.1523">
-                        <span class="slider-value" id="value_H_Cause_of_death_by_communicable_diseases_and_mate">-0.34</span>
                     </div>
                 </div>
                 <div class="slider-container">
@@ -881,7 +863,7 @@
                     <div class="slider-row">
                         <input type="range" class="slider" id="slider_H_Cause_of_death_by_non_communicable_diseases_ages"
                                min="0.02516125362276667" max="1.4274242150619" value="0.6962886953953619" step="0.014022629614391333"
-                               data-importance="2.0825">
+                               data-importance="0.6668">
                         <span class="slider-value" id="value_H_Cause_of_death_by_non_communicable_diseases_ages">0.70</span>
                     </div>
                 </div>
@@ -889,9 +871,27 @@
                     <label class="slider-label">H_Cause of death, by communicable diseases and maternal</label>
                     <div class="slider-row">
                         <input type="range" class="slider" id="slider_H_Cause_of_death_by_communicable_diseases_and_mate"
-                               min="-1.809301393083645" max="-0.09208432075796502" value="-0.8869349767229406" step="0.0171721707232568"
-                               data-importance="1.4461">
-                        <span class="slider-value" id="value_H_Cause_of_death_by_communicable_diseases_and_mate">-0.89</span>
+                               min="-1.795612359553516" max="0.6800901714308327" value="-0.47694757050050474" step="0.02475702530984349"
+                               data-importance="0.5941">
+                        <span class="slider-value" id="value_H_Cause_of_death_by_communicable_diseases_and_mate">-0.48</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label class="slider-label">H_Cause of death, by injury, ages 0-4, female (% of fem</label>
+                    <div class="slider-row">
+                        <input type="range" class="slider" id="slider_H_Cause_of_death_by_injury_ages_0_4_female_pct_of_"
+                               min="-0.1894758384291093" max="0.3501647545679381" value="0.10430796329907079" step="0.005396405929970474"
+                               data-importance="0.4201">
+                        <span class="slider-value" id="value_H_Cause_of_death_by_injury_ages_0_4_female_pct_of_">0.10</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label class="slider-label">H_Cause of death, by injury, ages 5-14, female (% of fe</label>
+                    <div class="slider-row">
+                        <input type="range" class="slider" id="slider_H_Cause_of_death_by_injury_ages_5_14_female_pct_of"
+                               min="-0.4553918300829717" max="1.524958711273135" value="0.21889501827080024" step="0.019803505413561066"
+                               data-importance="0.4049">
+                        <span class="slider-value" id="value_H_Cause_of_death_by_injury_ages_5_14_female_pct_of">0.22</span>
                     </div>
                 </div>
             </div>
