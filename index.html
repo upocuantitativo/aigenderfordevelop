@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dual Target Analysis - GDP Growth & G_Score-Trading across borders (DB16-20 methodology)</title>
+    <title>Dual Target Analysis - GDP Growth & Trading Score (DB16-20 methodology)</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -310,7 +310,7 @@
     <div class="header">
         <h1>ROBUST Dual Target Analysis - Gender & Entrepreneurship</h1>
         <div class="subtitle">
-            GDP Growth + G_Score-Trading across borders (DB16-20 methodology) | 52 Countries | 131 Variables<br>
+            GDP Growth + Trading Score (DB16-20 methodology) | 52 Countries | 131 Variables<br>
             Analysis Date: 04 November 2025
         </div>
     </div>
@@ -337,8 +337,8 @@
             </div>
 
             <div class="target-panel poor">
-                <h3 style="margin-top: 0; color: #c62828;">Target 2: G_Score-Trading across borders (DB16-20 methodology) ✗</h3>
-                <strong>Variable:</strong> G_Score-Trading across borders (DB16-20 methodology)<br>
+                <h3 style="margin-top: 0; color: #c62828;">Target 2: Trading Score (DB16-20 methodology) ✗</h3>
+                <strong>Variable:</strong> Trading Score (DB16-20 methodology)<br>
                 <strong>Best Model:</strong> Random Forest<br>
                 <strong>R²:</strong> 0.573 (Poor fit)<br>
                 <strong>RMSE:</strong> 13.68<br>
@@ -346,7 +346,7 @@
                 <strong>Bootstrap 95% CI:</strong> [-0.415, 0.731]
                 <p class="note" style="margin-top: 8px; color: #c62828;">
                 <strong>Note:</strong> Negative R² indicates the model performs worse than a simple mean baseline.
-                The G_Score-Trading across borders (DB16-20 methodology) may not be well-predicted by gender indicators alone.
+                The Trading Score (DB16-20 methodology) may not be well-predicted by gender indicators alone.
                 </p>
             </div>
         </div>
@@ -361,7 +361,7 @@
                 <li><strong>Targets:</strong>
                     <ul style="margin-left: 15px;">
                         <li>GDP per capita growth trajectory (G_GPD_PCAP_SLOPE)</li>
-                        <li>G_Score-Trading across borders (DB16-20 methodology) score</li>
+                        <li>Trading Score (DB16-20 methodology) score</li>
                     </ul>
                 </li>
                 <li><strong>Split:</strong> 75% training, 25% testing</li>
@@ -427,7 +427,7 @@
             </tr>
         </table>
 
-        <h2>G_Score-Trading across borders (DB16-20 methodology) - Model Comparison (Top 3)</h2>
+        <h2>Trading Score (DB16-20 methodology) - Model Comparison (Top 3)</h2>
         <table>
             <tr>
                 <th style="width: 40px;">Rank</th>
@@ -462,13 +462,13 @@
                 <td>-0.0376</td>
             </tr>
         </table>
-        <p class="note">Note: All models for G_Score-Trading across borders (DB16-20 methodology) show poor performance (negative R²), indicating that gender indicators alone may not adequately predict this outcome.</p>
+        <p class="note">Note: All models for Trading Score (DB16-20 methodology) show poor performance (negative R²), indicating that gender indicators alone may not adequately predict this outcome.</p>
 
         <h2>SHAP Feature Importance - GDP Growth</h2>
         <p>Click image to enlarge.</p>
         <img src="graficos_finales/shap_GDP_Growth_robust.png" alt="SHAP GDP Growth" onclick="openModal(this)">
 
-        <h2>SHAP Feature Importance - G_Score-Trading across borders (DB16-20 methodology)</h2>
+        <h2>SHAP Feature Importance - Trading Score (DB16-20 methodology)</h2>
         <p>Click image to enlarge.</p>
         <img src="graficos_finales/shap_Trading_Score_robust.png" alt="SHAP Trading Score" onclick="openModal(this)">
 
@@ -481,7 +481,7 @@
         <img src="graficos_finales/residual_details_robust_GDP_Growth.png" alt="Residual Details GDP" onclick="openModal(this)" style="margin-top: 10px;">
         <p class="note">Detailed residual diagnostics: sequence plot, scale-location, bootstrap R² distribution, and standardized residuals.</p>
 
-        <h2>Robustness Analysis - G_Score-Trading across borders (DB16-20 methodology)</h2>
+        <h2>Robustness Analysis - Trading Score (DB16-20 methodology)</h2>
         <p>Diagnostic plots for Trading Score model (note poor model fit). Click to enlarge.</p>
         <img src="graficos_finales/robustness_robust_Trading_Score.png" alt="Robustness Ease" onclick="openModal(this)">
         <img src="graficos_finales/residual_details_robust_Trading_Score.png" alt="Residual Details Ease" onclick="openModal(this)" style="margin-top: 10px;">
@@ -513,7 +513,7 @@
             </tr>
         </table>
 
-        <h2>Validation Statistics - G_Score-Trading across borders (DB16-20 methodology)</h2>
+        <h2>Validation Statistics - Trading Score (DB16-20 methodology)</h2>
         <table>
             <tr><th>Test</th><th>Value</th><th>Interpretation</th></tr>
             <tr>
@@ -793,7 +793,7 @@
     <!-- TAB 3: Dual Target Projections -->
     <div class="tab-content active" id="tab-2">
         <h2>Dual Target Policy Sensitivity Analysis</h2>
-        <p>Adjust key variables to see projected impact on <strong>both GDP Growth and G_Score-Trading across borders (DB16-20 methodology)</strong>.</p>
+        <p>Adjust key variables to see projected impact on <strong>both GDP Growth and Trading Score (DB16-20 methodology)</strong>.</p>
 
         <div class="summary">
             <strong>Instructions:</strong> Move sliders below to adjust variable values. The projection shows changes
@@ -902,7 +902,7 @@
                     <canvas id="projectionChart" width="500" height="380" style="max-width: 100%; margin: 15px 0; border: 1px solid #ddd;"></canvas>
                     <div class="note" style="margin-top: 10px;">
                         <strong>Blue bars:</strong> GDP Growth (reliable model)<br>
-                        <strong>Orange bars:</strong> G_Score-Trading across borders (DB16-20 methodology) (caution: poor model fit)
+                        <strong>Orange bars:</strong> Trading Score (DB16-20 methodology) (caution: poor model fit)
                     </div>
                 </div>
             </div>
@@ -917,7 +917,7 @@
                 <li><strong>H_Cause of death, by communicable diseases and maternal, pre:</strong> Increases are associated with higher GDP growth (r=0.540)</li>
             </ul>
             <p class="note" style="margin-top: 8px;">
-            <strong>Important:</strong> G_Score-Trading across borders (DB16-20 methodology) predictions are shown but should be interpreted with extreme caution due to poor model performance.
+            <strong>Important:</strong> Trading Score (DB16-20 methodology) predictions are shown but should be interpreted with extreme caution due to poor model performance.
             The gender indicators may not capture the institutional and regulatory factors that drive business environment quality.
             </p>
         </div>
