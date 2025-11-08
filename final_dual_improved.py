@@ -56,7 +56,6 @@ exclude_cols = (['Pais', 'Etiqueta_pais', 'Country code', 'Country code2',
                 g_vars)
 
 # Get only original gender/development indicators (not Doing Business variables)
-# EXCLUDE all H_Cause of death variables
 potential_predictors = [col for col in df.columns
                        if col not in exclude_cols
                        and not col.startswith('Score-')
@@ -68,8 +67,7 @@ potential_predictors = [col for col in df.columns
                        and 'Time (years)' not in col
                        and 'Time (hours' not in col
                        and 'Cost (' not in col
-                       and 'Procedures' not in col
-                       and 'H_Cause of death' not in col]
+                       and 'Procedures' not in col]
 
 print(f"\nGender/development predictors available: {len(potential_predictors)}")
 
