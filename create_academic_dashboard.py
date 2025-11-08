@@ -52,6 +52,10 @@ tax_shap_img = encode_image('resultados/graficos_finales/shap_Tax_Score_new.png'
 tax_robustness_img = encode_image('resultados/graficos_finales/robustness_Tax_Score_new.png')
 tax_residual_img = encode_image('resultados/graficos_finales/residual_details_Tax_Score_new.png')
 
+# Images for Descriptives
+correlation_img = encode_image('resultados/graficos_finales/correlation_analysis.png')
+cluster_img = encode_image('resultados/graficos_finales/cluster_analysis_tax.png')
+
 # Get descriptive statistics
 g_vars = [c for c in df.columns if c.startswith('G_')]
 num_countries = df.shape[0]
@@ -383,7 +387,28 @@ html_content = f"""<!DOCTYPE html>
             </ul>
         </div>
 
-        <h2>4. Key Changes from Previous Version</h2>
+        <h2>4. Correlation Analysis</h2>
+
+        <p>Pearson correlation coefficients between predictors and Ease of Doing Business Score.</p>
+"""
+
+if correlation_img:
+    html_content += f"""        <img src="data:image/png;base64,{correlation_img}" alt="Correlation Analysis" onclick="openModal(this.src)">
+"""
+
+html_content += """
+        <h2>5. Cluster Analysis</h2>
+
+        <p>K-Means clustering (k=3) of countries based on top 15 gender and development indicators.
+        Left panel shows PCA projection with 95% confidence ellipses. Right panel shows cluster characteristics.</p>
+"""
+
+if cluster_img:
+    html_content += f"""        <img src="data:image/png;base64,{cluster_img}" alt="Cluster Analysis" onclick="openModal(this.src)">
+"""
+
+html_content += """
+        <h2>6. Key Changes from Previous Version</h2>
 
         <div class="summary">
             <p><strong>Exclusion of Mortality Data:</strong> All 16 variables containing "H_Cause of death" have been removed from the predictor pool. This includes:</p>
